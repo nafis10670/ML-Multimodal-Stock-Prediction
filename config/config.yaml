@@ -1,0 +1,109 @@
+# Project configuration
+
+data:
+  # Stock universe
+  universe: "spy_only"  # Options: "spy_only", "top_10_sp500", "top_50_sp500"
+
+  # Date range
+  start_date: "2010-01-01"
+  end_date: "2024-12-31"
+
+  # Target definition
+  target: "log_return"  # Options: "log_return", "direction"
+  horizon: 1  # Prediction horizon in days (1, 5, or 20)
+
+  # Market context tickers
+  market_tickers:
+    - "^VIX"      # Volatility index
+    - "SPY"       # S&P 500 ETF
+    - "XLF"       # Financials sector
+    - "XLK"       # Technology sector
+    - "GLD"       # Gold
+    - "IEF"       # Treasury bonds
+    - "DX-Y.NYB"  # US Dollar Index
+
+features:
+  # Lag periods
+  return_lags: [1, 2, 3, 4, 5, 10, 20]
+
+  # Rolling windows
+  rolling_windows: [5, 10, 20, 60]
+
+  # Technical indicators
+  technicals:
+    - "rsi"
+    - "macd"
+    - "atr"
+    - "bollinger"
+
+  # Volume features
+  volume_lookback: 20
+
+models:
+  # Baseline models
+  baselines:
+    - "naive"
+    - "momentum"
+    - "arima"
+    - "ridge"
+    - "lasso"
+    - "xgboost"
+    - "lightgbm"
+
+  # Sequence models
+  sequence:
+    lstm:
+      hidden_size: 64
+      num_layers: 2
+      dropout: 0.2
+      sequence_length: 20
+
+    tcn:
+      num_channels: [32, 64, 64]
+      kernel_size: 3
+      dropout: 0.2
+      sequence_length: 20
+
+validation:
+  # Walk-forward configuration
+  train_years: 5
+  val_years: 1
+  test_years: 1
+  step_months: 12
+
+  # Embargo for purged CV (days)
+  embargo_days: 5
+
+backtest:
+  # Transaction costs (basis points)
+  transaction_cost_bps: 10
+
+  # Slippage (basis points)
+  slippage_bps: 5
+
+  # Risk management
+  max_position_size: 1.0  # Maximum position as fraction of portfolio
+  vix_threshold: 30  # Don't trade when VIX > threshold
+
+  # Trading thresholds
+  trade_threshold: 0.0  # Minimum predicted return to trade
+  no_trade_band: 0.001  # No-trade band around zero
+
+training:
+  # General
+  seed: 42
+  device: "auto"  # "cpu", "cuda", or "auto"
+
+  # Neural network training
+  batch_size: 64
+  max_epochs: 100
+  learning_rate: 0.001
+  early_stopping_patience: 10
+
+  # Hyperparameter optimization
+  n_trials: 50
+
+output:
+  figures_dir: "reports/figures"
+  models_dir: "models"
+  results_dir: "results"
